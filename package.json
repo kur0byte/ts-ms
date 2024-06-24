@@ -1,0 +1,46 @@
+{
+  "name": "microservice",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "jest /tests",
+    "test:watch": "jest --watch /tests",
+    "test:coverage": "jest --coverage /tests",
+    "build:clean": "gts clean",
+    "build:compile": "tsc -b",
+    "prepare": "npm run build:compile",
+    "lint": "gts lint",
+    "lint:fix": "gts fix",
+    "lint:commit": "npx --no -- commitlint --edit $1",
+    "start:dev": "npx ts-node-dev --respawn --transpile-only src/index.ts",
+    "start:prod": "node build/src/index.js",
+    "release:prod": "npx semantic-release",
+    "release:dev": "npx semantic-release -d",
+    "docs:build": "typedoc --out docs src",
+    "docs:serve": "npx http-server docs",
+    "pretest": "npm run build:compile",
+    "posttest": "npm run lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@eslint/js": "^9.5.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/node": "^20.12.7",
+    "eslint": "^8.57.0",
+    "globals": "^15.6.0",
+    "gts": "^5.3.1",
+    "husky": "^9.0.11",
+    "tslib": "^2.6.3",
+    "typedoc": "^0.26.2",
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^7.13.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
