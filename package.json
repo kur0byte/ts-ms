@@ -9,7 +9,7 @@
     "build:clean": "gts clean",
     "build:compile": "tsc -b",
     "prepare": "npm run build:compile",
-    "lint": "gts lint",
+    "lint:check": "gts lint",
     "lint:fix": "gts fix",
     "lint:commit": "npx --no -- commitlint --edit $1",
     "start:dev": "npx ts-node-dev --respawn --transpile-only src/index.ts",
