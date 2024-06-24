@@ -1,6 +1,11 @@
 name: build
 
 on:
+  workflow_run:
+    workflows: ['code-security']
+    types:
+      - completed
+
   pull_request:
     branches:
       - main
