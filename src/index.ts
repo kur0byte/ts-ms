@@ -1,8 +1,10 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 // write a test  sum function
 /**
  * @description sum two numbers
  */
-function sum(a: number, b: number): number {
+export function sum(a: number, b: number): number {
   return a + b;
 }
 
