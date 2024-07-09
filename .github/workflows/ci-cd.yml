@@ -36,17 +36,16 @@ jobs:
 
   semantic-release:
     needs: build-and-test
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Run semantic-release
+        run: npx semantic-release
 
   build-and-push-docker:
     needs: semantic-release
