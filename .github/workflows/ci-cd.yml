@@ -44,11 +44,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
       - name: Install dependencies
@@ -61,69 +61,69 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
 
-  build-and-push-docker:
-    needs: semantic-release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
+  # build-and-push-docker:
+  #   needs: semantic-release
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+  #     - name: Get the version
+  #       id: get_version
+  #       run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
 
-      - name: Log in to GitHub Docker Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Log in to GitHub Docker Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          build-args: |
-            VERSION=${{ steps.get_version.outputs.VERSION }}
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         push: true
+  #         tags: |
+  #           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+  #           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+  #         build-args: |
+  #           VERSION=${{ steps.get_version.outputs.VERSION }}
 
-  deploy-to-dev:
-    needs: build-and-push-docker
-    if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Dev
-        run: |
-          echo "Deploying to Dev environment"
-          # Add kubectl commands to deploy to your dev Kubernetes cluster
-          # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+  # deploy-to-dev:
+  #   needs: build-and-push-docker
+  #   if: github.ref == 'refs/heads/develop'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Deploy to Dev
+  #       run: |
+  #         echo "Deploying to Dev environment"
+  #         # Add kubectl commands to deploy to your dev Kubernetes cluster
+  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
-  deploy-to-staging:
-    needs: build-and-push-docker
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Staging
-        run: |
-          echo "Deploying to Staging environment"
-          # Add kubectl commands to deploy to your staging Kubernetes cluster
-          # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+  # deploy-to-staging:
+  #   needs: build-and-push-docker
+  #   if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Deploy to Staging
+  #       run: |
+  #         echo "Deploying to Staging environment"
+  #         # Add kubectl commands to deploy to your staging Kubernetes cluster
+  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
 
-  deploy-to-prod:
-    needs: deploy-to-staging
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy to Production
-        run: |
-          echo "Deploying to Production environment"
-          # Add kubectl commands to deploy to your production Kubernetes cluster
-          # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+  # deploy-to-prod:
+  #   needs: deploy-to-staging
+  #   if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Deploy to Production
+  #       run: |
+  #         echo "Deploying to Production environment"
+  #         # Add kubectl commands to deploy to your production Kubernetes cluster
+  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
