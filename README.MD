@@ -1,5 +1,3 @@
-Certainly! Here's the entire README file in Markdown format for your microservice project:
-
 # Microservice Project
 
 This project is a microservice developed in TypeScript, designed to perform specific backend functionalities as a part of a larger system.
