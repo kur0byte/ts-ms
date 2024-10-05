@@ -1,11 +1,14 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
-// write a test  sum function
-/**
- * @description sum two numbers
- */
-export function sum(a: number, b: number): number {
-  return a + b;
-}
+import 'reflect-metadata';
+import 'dotenv/config';
+import 'module-alias/register';
+import {iocContainer} from './config/dic/inversify.config';
+import ExpressServer from './infrastructure/http/express/server';
+import {initDatabase} from './infrastructure/db';
 
-console.log(sum(1, 2) === 3);
+if (process.env.MICROSERVICE === 'HTTP') {
+  initDatabase();
+  const server = new ExpressServer(iocContainer);
+  server.start();
+} else {
+  console.log('No microservice selected');
+}
