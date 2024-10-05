@@ -1,14 +1,27 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "rootDir": ".",
+    "baseUrl": ".",
     "outDir": "build",
-    "target": "ES6"
+    "target": "ES6",
+    "resolveJsonModule": true,
+    "paths": {
+      "@Customer/*": ["src/modules/Customer/*"],
+      "@config/*": ["src/config/*"],
+      "@shared/*": ["src/shared/*"],
+     },
+  },
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "docs/typedoc"
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+  ],
+"exclude": ["node_modules"],
 }
