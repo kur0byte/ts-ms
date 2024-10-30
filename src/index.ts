@@ -7,6 +7,7 @@ import {initDatabase} from './infrastructure/db';
 
 if (process.env.MICROSERVICE === 'HTTP') {
   initDatabase();
+
   const server = new ExpressServer(iocContainer);
   server.start();
 } else {
