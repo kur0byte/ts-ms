@@ -156,9 +156,9 @@ git push origin hotfix/issue-fix
 
 ## Pipeline Status Badges
 
-[![Continuous Integration](https://github.com/{owner}/{repo}/actions/workflows/ci.yml/badge.svg)](https://github.com/{owner}/{repo}/actions/workflows/ci.yml)
-[![Release](https://github.com/{owner}/{repo}/actions/workflows/release.yml/badge.svg)](https://github.com/{owner}/{repo}/actions/workflows/release.yml)
-[![Security Scan](https://github.com/{owner}/{repo}/actions/workflows/security.yml/badge.svg)](https://github.com/{owner}/{repo}/actions/workflows/security.yml)
+[![Continuous Integration](https://github.com/kur0byte/ts-ms/actions/workflows/ci.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/ci.yml)
+[![Release](https://github.com/kur0byte/ts-ms/actions/workflows/release.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/release.yml)
+[![Security Scan](https://github.com/kur0byte/ts-ms/actions/workflows/security.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/security.yml)
 
 ## Environment Setup
 
@@ -208,32 +208,3 @@ Monitor pipeline status:
 2. Release logs in GitHub Releases
 3. Docker image registry
 4. Documentation artifacts
-
-## Best Practices
-
-1. **Commits**
-   - Use conventional commit format
-   - Include scope when applicable
-   - Reference issues in commit body
-
-2. **Pull Requests**
-   - Follow PR template
-   - Include tests
-   - Update documentation
-   - Link related issues
-
-3. **Code Quality**
-   - Maintain test coverage
-   - Address all linting issues
-   - Document public APIs
-
-4. **Security**
-   - Review dependency updates
-   - Address security alerts promptly
-   - Keep Docker base images updated
-
-## Contacts
-
-- **CI/CD Issues**: Open an issue with label `ci-cd`
-- **Security Concerns**: Open an issue with label `security`
-- **Documentation Updates**: Open an issue with label `documentation`
