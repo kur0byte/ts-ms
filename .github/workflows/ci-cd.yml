@@ -1,136 +1,313 @@
-name: CI/CD Pipeline
+# name: CI/CD Pipeline
+
+# on:
+#   push:
+#     branches: [main, develop]
+#   pull_request:
+#     branches: [main, develop]
+
+# env:
+#   REGISTRY: ghcr.io
+#   IMAGE_NAME: ${{ github.repository }}
+
+# jobs:
+#   security-scan:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Run Snyk to check for vulnerabilities
+#         uses: snyk/actions/node@master
+#         env:
+#           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#         with:
+#           command: test
+
+#   build-and-test:
+#     needs: security-scan
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Use Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 'lts/*'
+#       - run: npm ci
+#       - run: npm test
+
+#   semantic-release:
+#     needs: build-and-test
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#     permissions:
+#       contents: write # to be able to publish a GitHub release
+#       issues: write # to be able to comment on released issues
+#       pull-requests: write # to be able to comment on released pull requests
+#       id-token: write # to enable use of OIDC for npm provenance
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 'lts/*'
+#       - name: Install dependencies
+#         run: npm ci
+#       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+#         run: npm audit signatures
+#       - name: Release
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#         run: npx semantic-release
+
+#   build-and-push-docker:
+#     needs: semantic-release
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       packages: write
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Get the version
+#         id: get_version
+#         run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+
+#       - name: Log in to GitHub Docker Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ${{ env.REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Build and push
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: .
+#           push: true
+#           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+  
+#       # - name: Build and push Docker image
+#       #   uses: docker/build-push-action@v4
+#       #   with:
+#       #     push: true
+#       #     tags: |
+#       #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+#       #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+#       #     build-args: |
+#       #       VERSION=${{ steps.get_version.outputs.VERSION }}
+
+#   # deploy-to-dev:
+#   #   needs: build-and-push-docker
+#   #   if: github.ref == 'refs/heads/develop'
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - uses: actions/checkout@v4
+#   #     - name: Deploy to Dev
+#   #       run: |
+#   #         echo "Deploying to Dev environment"
+#   #         # Add kubectl commands to deploy to your dev Kubernetes cluster
+#   #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+#   # deploy-to-staging:
+#   #   needs: build-and-push-docker
+#   #   if: github.ref == 'refs/heads/main'
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - uses: actions/checkout@v4
+#   #     - name: Deploy to Staging
+#   #       run: |
+#   #         echo "Deploying to Staging environment"
+#   #         # Add kubectl commands to deploy to your staging Kubernetes cluster
+#   #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+
+#   # deploy-to-prod:
+#   #   needs: deploy-to-staging
+#   #   if: github.ref == 'refs/heads/main'
+#   #   runs-on: ubuntu-latest
+#   #   environment: production
+#   #   steps:
+#   #     - uses: actions/checkout@v4
+#   #     - name: Deploy to Production
+#   #       run: |
+#   #         echo "Deploying to Production environment"
+#   #         # Add kubectl commands to deploy to your production Kubernetes cluster
+#   #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+
+name: Continuous Integration
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ develop, main ]
   pull_request:
-    branches: [main, develop]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+    branches: [ develop ]
 
 jobs:
-  security-scan:
+  commitlint:
+    name: Lint Commit Messages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Validate commit messages
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha || 'HEAD~1' }} --to ${{ github.event.pull_request.head.sha || 'HEAD' }} --verbose
+
+  code-quality:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run build:compile
+
+      - name: Lint check
+        run: npm run lint:check
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+  documentation:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate documentation
+        run: npm run docs:build
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: |
+            src/docs/typedoc
+            src/docs/openapi
+          retention-days: 30
+
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
+        continue-on-error: true
 
-  build-and-test:
-    needs: security-scan
+  release:
+    name: Create Release
     runs-on: ubuntu-latest
+    needs: [commitlint, code-quality, documentation, security]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      packages: write
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-      - run: npm ci
-      - run: npm test
-
-  semantic-release:
-    needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
-      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
-        run: npm audit signatures
-      - name: Release
+
+      - name: Set Git configuration
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            npm run release:prod
+          else
+            npm run release:dev
+          fi
 
-  build-and-push-docker:
-    needs: semantic-release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
-
-      - name: Log in to GitHub Docker Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-  
-      # - name: Build and push Docker image
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     push: true
-      #     tags: |
-      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
-      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-      #     build-args: |
-      #       VERSION=${{ steps.get_version.outputs.VERSION }}
-
-  # deploy-to-dev:
-  #   needs: build-and-push-docker
-  #   if: github.ref == 'refs/heads/develop'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Deploy to Dev
-  #       run: |
-  #         echo "Deploying to Dev environment"
-  #         # Add kubectl commands to deploy to your dev Kubernetes cluster
-  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-  # deploy-to-staging:
-  #   needs: build-and-push-docker
-  #   if: github.ref == 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Deploy to Staging
-  #       run: |
-  #         echo "Deploying to Staging environment"
-  #         # Add kubectl commands to deploy to your staging Kubernetes cluster
-  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
-
-  # deploy-to-prod:
-  #   needs: deploy-to-staging
-  #   if: github.ref == 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   environment: production
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Deploy to Production
-  #       run: |
-  #         echo "Deploying to Production environment"
-  #         # Add kubectl commands to deploy to your production Kubernetes cluster
-  #         # kubectl set image deployment/your-app your-app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ github.sha }}
