@@ -1,7 +1,7 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import fs from 'fs';
 import path from 'path';
-import yaml from 'js-yaml';
+import yaml from 'yamljs';
 
 const options = {
   definition: {
@@ -17,7 +17,7 @@ const options = {
 const generateOpenApiSpec = async () => {
   try {
     const openapiSpecification = await swaggerJSDoc(options);
-    const docsPath = path.join(__dirname, '../docs');
+    const docsPath = path.join(__dirname, '../../docs');
 
     if (!fs.existsSync(docsPath)) {
       fs.mkdirSync(docsPath);
@@ -30,7 +30,7 @@ const generateOpenApiSpec = async () => {
     );
     console.log('OpenAPI specification has been written to /docs/openapi.json');
 
-    const yamlSpec = yaml.dump(openapiSpecification);
+    const yamlSpec = yaml.stringify(openapiSpecification);
     fs.writeFileSync(path.join(docsPath, 'openapi.yml'), yamlSpec, 'utf8');
     console.log('OpenAPI specification has been written to /docs/openapi.yml');
   } catch (error) {

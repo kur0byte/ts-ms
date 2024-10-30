@@ -1,0 +1,94 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ts-microservice</title><meta name="description" content="Documentation for ts-microservice"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">ts-microservice</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>ts-microservice</h2></div><div class="tsd-panel tsd-typography"><a id="md:typescript-microservice-boilerplate" class="tsd-anchor"></a><h1 class="tsd-anchor-link">TypeScript Microservice Boilerplate<a href="#md:typescript-microservice-boilerplate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><a id="md:overview" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Overview<a href="#md:overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This project is a robust TypeScript microservice implementation that adheres to Domain-Driven Design (DDD) principles and Clean Architecture. It provides a scalable and maintainable foundation for building complex business applications with a clear separation of concerns.</p>
+<a id="md:key-features" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Key Features<a href="#md:key-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><strong>Domain-Driven Design (DDD)</strong>: Focuses on the core domain and domain logic.</li>
+<li><strong>Clean Architecture</strong>: Ensures that business rules are independent of frameworks and databases.</li>
+<li><strong>TypeScript</strong>: Leverages strong typing for improved developer experience and code quality.</li>
+<li><strong>Modularity</strong>: Organized into distinct modules for easy scaling and maintenance.</li>
+<li><strong>Dependency Injection</strong>: Uses InversifyJS for inversion of control.</li>
+<li><strong>ORM Integration</strong>: Incorporates TypeORM for database operations.</li>
+<li><strong>API Documentation</strong>: Automatic OpenAPI (Swagger) documentation generation.</li>
+<li><strong>Code Documentation</strong>: TypeDoc for generating code documentation.</li>
+<li><strong>Testing</strong>: Jest setup for unit and integration testing.</li>
+<li><strong>Linting and Formatting</strong>: Ensures code quality and consistency.</li>
+<li><strong>Continuous Integration</strong>: Includes scripts for semantic versioning and releases.</li>
+</ul>
+<a id="md:project-structure" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Project Structure<a href="#md:project-structure" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code><span class="hl-0">src</span><span class="hl-1">/</span><br/><span class="hl-1">├── </span><span class="hl-0">config</span><span class="hl-1">/          # </span><span class="hl-0">Configuration</span><span class="hl-1"> </span><span class="hl-0">files</span><br/><span class="hl-1">├── </span><span class="hl-0">infrastructure</span><span class="hl-1">/  # </span><span class="hl-0">Infrastructure</span><span class="hl-1"> </span><span class="hl-2">layer</span><span class="hl-1"> (</span><span class="hl-0">databases</span><span class="hl-1">, </span><span class="hl-0">external</span><span class="hl-1"> </span><span class="hl-0">services</span><span class="hl-1">)</span><br/><span class="hl-1">├── </span><span class="hl-0">modules</span><span class="hl-1">/         # </span><span class="hl-0">Feature</span><span class="hl-1"> </span><span class="hl-2">modules</span><span class="hl-1"> (</span><span class="hl-0">e</span><span class="hl-1">.</span><span class="hl-0">g</span><span class="hl-1">., </span><span class="hl-0">Customer</span><span class="hl-1">)</span><br/><span class="hl-1">│   └── </span><span class="hl-0">Customer</span><span class="hl-1">/    # </span><span class="hl-0">Example</span><span class="hl-1"> </span><span class="hl-3">module</span><br/><span class="hl-1">│       ├── </span><span class="hl-0">application</span><span class="hl-1">/    # </span><span class="hl-0">Application</span><span class="hl-1"> </span><span class="hl-0">services</span><span class="hl-1"> </span><span class="hl-0">and</span><span class="hl-1"> </span><span class="hl-0">DTOs</span><br/><span class="hl-1">│       ├── </span><span class="hl-0">domain</span><span class="hl-1">/         # </span><span class="hl-0">Domain</span><span class="hl-1"> </span><span class="hl-0">entities</span><span class="hl-1"> </span><span class="hl-0">and</span><span class="hl-1"> </span><span class="hl-0">interfaces</span><br/><span class="hl-1">│       ├── </span><span class="hl-0">infrastructure</span><span class="hl-1">/ # </span><span class="hl-0">Repository</span><span class="hl-1"> </span><span class="hl-0">implementations</span><br/><span class="hl-1">│       └── </span><span class="hl-0">presentation</span><span class="hl-1">/   # </span><span class="hl-0">Controllers</span><span class="hl-1"> </span><span class="hl-0">and</span><span class="hl-1"> </span><span class="hl-0">routes</span><br/><span class="hl-1">├── </span><span class="hl-0">shared</span><span class="hl-1">/          # </span><span class="hl-0">Shared</span><span class="hl-1"> </span><span class="hl-2">kernel</span><span class="hl-1"> (</span><span class="hl-0">base</span><span class="hl-1"> </span><span class="hl-0">classes</span><span class="hl-1">, </span><span class="hl-0">utilities</span><span class="hl-1">)</span><br/><span class="hl-1">└── </span><span class="hl-0">util</span><span class="hl-1">/            # </span><span class="hl-0">Utility</span><span class="hl-1"> </span><span class="hl-0">functions</span>
+</code><button>Copy</button></pre>
+
+<a id="md:getting-started" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Getting Started<a href="#md:getting-started" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ol>
+<li>
+<p>Clone the repository:</p>
+<pre><code><span class="hl-0">git</span><span class="hl-1"> </span><span class="hl-0">clone</span><span class="hl-1"> [</span><span class="hl-0">repository</span><span class="hl-1">-</span><span class="hl-0">url</span><span class="hl-1">]</span>
+</code><button>Copy</button></pre>
+
+</li>
+<li>
+<p>Install dependencies:</p>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">install</span>
+</code><button>Copy</button></pre>
+
+</li>
+<li>
+<p>Set up environment variables:
+Copy <code>.env.example</code> to <code>.env</code> and fill in the required values.</p>
+</li>
+<li>
+<p>Run the development server:</p>
+<pre><code><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-0">run</span><span class="hl-1"> </span><span class="hl-4">start</span><span class="hl-1">:</span><span class="hl-0">dev</span>
+</code><button>Copy</button></pre>
+
+</li>
+</ol>
+<a id="md:available-scripts" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Available Scripts<a href="#md:available-scripts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><code>npm run test</code>: Run tests</li>
+<li><code>npm run build:compile</code>: Compile TypeScript</li>
+<li><code>npm run lint:check</code>: Check for linting issues</li>
+<li><code>npm run lint:fix</code>: Fix linting issues</li>
+<li><code>npm run start:dev</code>: Start development server</li>
+<li><code>npm run start:prod</code>: Start production server</li>
+<li><code>npm run docs:build</code>: Generate API and code documentation</li>
+</ul>
+<a id="md:documentation" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Documentation<a href="#md:documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>To generate API and Code documentation</p>
+<ul>
+<li><code>npm run docs:build</code></li>
+</ul>
+<p>When running the server, documentation is avilable at:</p>
+<ul>
+<li><code>/docs/api</code> for API Docs.</li>
+<li><code>/docs/typedoc</code> for Code Docs</li>
+</ul>
+<a id="md:contributing" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Contributing<a href="#md:contributing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>We welcome contributions to this project! Here's a quick overview of the process:</p>
+<ol>
+<li><strong>Create a Feature Branch</strong> from <code>develop</code></li>
+<li><strong>Write Code and Commit</strong> following our commit message format</li>
+<li><strong>Submit a Pull Request</strong> using our PR template</li>
+<li><strong>Participate in Code Review</strong></li>
+<li><strong>Follow Coding Rules</strong> including testing and documentation</li>
+<li><strong>Merge</strong> once approved</li>
+</ol>
+<p>For a more detailed guide on each of these steps, including our commit message format, PR template, and coding rules, please read our <a href="media/CONTRIBUTING.md">full Contributing Guidelines</a>. This document provides in-depth information on:</p>
+<ul>
+<li>Detailed branch naming conventions</li>
+<li>Comprehensive commit message guidelines</li>
+<li>Complete PR template and best practices</li>
+<li>Step-by-step code review process</li>
+<li>Extensive coding rules and best practices</li>
+</ul>
+<p>We encourage all contributors, new and experienced, to review the full guidelines to ensure a smooth and effective collaboration process.</p>
+<p>Ready to contribute? Great! Start by reading the <a href="media/CONTRIBUTING.md">CONTRIBUTING.md</a> file, and feel free to reach out if you have any questions. We look forward to your contributions!</p>
+<p>Please ensure your code adheres to the project's coding standards and includes appropriate tests.</p>
+<a id="md:architecture-overview" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Architecture Overview<a href="#md:architecture-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This project follows Clean Architecture principles:</p>
+<ol>
+<li><strong>Domain Layer</strong>: Contains enterprise-wide logic and types.</li>
+<li><strong>Application Layer</strong>: Orchestrates the flow of data to and from the domain layer.</li>
+<li><strong>Infrastructure Layer</strong>: Implements interfaces defined in the domain layer.</li>
+<li><strong>Presentation Layer</strong>: Handles HTTP requests and responses.</li>
+</ol>
+<p>The use of DDD concepts like Aggregates, Value Objects, and Domain Events ensures a rich domain model that accurately represents the business rules.</p>
+<a id="md:license" class="tsd-anchor"></a><h2 class="tsd-anchor-link">License<a href="#md:license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This project is licensed under the [LICENSE NAME] - see the <a href="http://LICENSE.md" target="_blank" class="external">LICENSE.md</a> file for details.</p>
+<a id="md:acknowledgments" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Acknowledgments<a href="#md:acknowledgments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><a href="https://inversify.io/" target="_blank" class="external">Inversify</a> for dependency injection</li>
+<li><a href="https://typeorm.io/" target="_blank" class="external">TypeORM</a> for object-relational mapping</li>
+<li><a href="https://expressjs.com/" target="_blank" class="external">Express</a> for the web server framework</li>
+</ul>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:typescript-microservice-boilerplate"><span>Type<wbr/>Script <wbr/>Microservice <wbr/>Boilerplate</span></a><ul><li><a href="#md:overview"><span>Overview</span></a></li><li><a href="#md:key-features"><span>Key <wbr/>Features</span></a></li><li><a href="#md:project-structure"><span>Project <wbr/>Structure</span></a></li><li><a href="#md:getting-started"><span>Getting <wbr/>Started</span></a></li><li><a href="#md:available-scripts"><span>Available <wbr/>Scripts</span></a></li><li><a href="#md:documentation"><span>Documentation</span></a></li><li><a href="#md:contributing"><span>Contributing</span></a></li><li><a href="#md:architecture-overview"><span>Architecture <wbr/>Overview</span></a></li><li><a href="#md:license"><span>License</span></a></li><li><a href="#md:acknowledgments"><span>Acknowledgments</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>ts-microservice</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
