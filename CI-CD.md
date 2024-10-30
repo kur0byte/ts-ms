@@ -6,9 +6,9 @@ This project's CI/CD pipeline implements a robust automation process for code in
 
 ```mermaid
 flowchart TD
-    classDef phase fill:#e1eef6,stroke:#333,stroke-width:2px
-    classDef gate fill:#fff7dc,stroke:#333,stroke-width:2px
-    classDef env fill:#e5f5e0,stroke:#333,stroke-width:2px
+    <!-- classDef phase
+    classDef gate
+    classDef env -->
 
     subgraph "Local Development"
         A[Developer Push] --> B[Husky Pre-commit]
