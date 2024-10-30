@@ -154,12 +154,6 @@ git push origin hotfix/issue-fix
 # CI pipeline runs with priority
 ```
 
-## Pipeline Status Badges
-
-[![Continuous Integration](https://github.com/kur0byte/ts-ms/actions/workflows/ci.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/ci.yml)
-[![Release](https://github.com/kur0byte/ts-ms/actions/workflows/release.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/release.yml)
-[![Security Scan](https://github.com/kur0byte/ts-ms/actions/workflows/security.yml/badge.svg)](https://github.com/kur0byte/ts-ms/actions/workflows/security.yml)
-
 ## Environment Setup
 
 ### Required Secrets
