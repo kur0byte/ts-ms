@@ -5,7 +5,9 @@ import {randomUUID} from 'crypto';
 
 @injectable()
 export class RequestLoggerMiddleware {
-  constructor(@inject(LoggerService) private readonly logger: LoggerService) {}
+  constructor(@inject(LoggerService) private readonly logger: LoggerService) {
+    this.handle = this.handle.bind(this);
+  }
 
   public handle(req: Request, res: Response, next: NextFunction): void {
     const requestId = randomUUID();
