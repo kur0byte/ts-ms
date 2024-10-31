@@ -8,7 +8,7 @@ import {TYPES} from '@config/dic/types';
 import {CustomerTypeOrmRepository} from '@Customer/infrastructure/CustomerTypeOrm.repository';
 import {LoggerService} from '@shared/logger/logger';
 import {RequestLoggerMiddleware} from '@shared/middleware/request-logger-middleware';
-import {BaseServer} from '@shared/server/HTTPServer.abstract';
+import {HTTPBaseServer} from '@shared/server/HTTPBaseServer.abstract';
 import {HTTPMicroserviceServer} from '../../infrastructure/http/express/server';
 import {CustomerHTTPRoutes} from '@Customer/presentation/Customer.routes';
 
@@ -25,7 +25,7 @@ container.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
 
 // Server
 container
-  .bind<BaseServer>(BaseServer)
+  .bind<HTTPBaseServer>(HTTPBaseServer)
   .to(HTTPMicroserviceServer)
   .inSingletonScope();
 container
