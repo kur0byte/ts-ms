@@ -1,19 +1,20 @@
-import {CustomerController} from '@Customer/presentation/Customer.httpController';
-import {TYPES} from '@config/dic/types';
-import {Container} from 'inversify';
-import express, {Application} from 'express';
+import {injectable, inject} from 'inversify';
+import express from 'express';
+import {LoggerService} from '../../../shared/logger/logger';
 
-export const CustomerHTTPRoutes = (
-  server: Application,
-  container: Container
-) => {
-  const customerController = container.get<CustomerController>(
-    TYPES.CustomerController
-  );
-  const router = express.Router();
+@injectable()
+export class CustomerHTTPRoutes {
+  public readonly router: express.Router;
 
-  router.get('/', (req, res) => customerController.getCustomers(req, res));
-  router.post('/', (req, res) => customerController.createCustomer(req, res));
+  constructor(@inject(LoggerService) private readonly logger: LoggerService) {
+    this.router = express.Router();
+    this.initializeRoutes();
+  }
 
-  return router;
-};
+  private initializeRoutes() {
+    this.logger.http('[Customer Routes] Initializing');
+    this.router.get('/', (req, res) => {
+      res.send('Customer route');
+    });
+  }
+}
