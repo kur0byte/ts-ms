@@ -6,8 +6,20 @@ import {CustomerRepository} from '@Customer/infrastructure/CustomerRepository';
 import {CustomerController} from '@Customer/presentation/Customer.httpController';
 import {TYPES} from '@config/dic/types';
 import {CustomerTypeOrmRepository} from '@Customer/infrastructure/CustomerTypeOrm.repository';
+import {LoggerService} from '@shared/logger/logger';
+import {RequestLoggerMiddleware} from '@shared/middleware/request-logger-middleware';
 
 const container = new Container({autoBindInjectable: true});
+
+// Logger
+// Register logger service as singleton
+container.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
+
+// Register request logger middleware
+container
+  .bind<RequestLoggerMiddleware>(RequestLoggerMiddleware)
+  .toSelf()
+  .inSingletonScope();
 
 // Controllers
 container

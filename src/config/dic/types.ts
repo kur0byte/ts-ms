@@ -4,4 +4,5 @@ export const TYPES = {
   CreateCustomerUseCase: Symbol.for('CreateCustomerUseCase'),
   GetCustomerUseCase: Symbol.for('GetCustomerUseCase'),
   CustomerController: Symbol.for('CustomerController'),
+  LoggerService: Symbol.for('LoggerService'),
 };
