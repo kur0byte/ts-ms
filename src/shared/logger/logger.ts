@@ -1,5 +1,6 @@
 import {injectable} from 'inversify';
 import winston, {Logger, format} from 'winston';
+import {LoggingWinston} from '@google-cloud/logging-winston';
 import 'winston-daily-rotate-file';
 import {randomUUID} from 'crypto';
 
@@ -26,6 +27,7 @@ export class LoggerService {
 
   constructor() {
     const environment = process.env.NODE_ENV || 'development';
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT;
 
     // Define custom format
     const customFormat = combine(
@@ -44,7 +46,7 @@ export class LoggerService {
           msg += ` [RequestId: ${metadata.requestId}]`;
         }
 
-        if (metadata.error) {
+        if (metadata.error?.stack) {
           msg += `\nError: ${metadata.error.stack}`;
         }
 
@@ -53,9 +55,9 @@ export class LoggerService {
     );
 
     // Configure transports based on environment
-    const transports = [];
+    const transports: winston.transport[] = [];
 
-    // Console transport (all environments)
+    // Always add console transport
     transports.push(
       new winston.transports.Console({
         level: environment === 'production' ? 'info' : 'debug',
@@ -63,7 +65,32 @@ export class LoggerService {
       })
     );
 
-    // File transports (production only)
+    // Add Google Cloud Logging in production
+    if (environment === 'production' && projectId) {
+      const googleLogging = new LoggingWinston({
+        projectId,
+        logName: 'ts-microservice',
+        serviceContext: {
+          service: process.env.SERVICE_NAME || 'ts-microservice',
+          version: process.env.VERSION || 'unknown',
+        },
+        resource: {
+          type: 'cloud_run_revision',
+          labels: {
+            service_name: process.env.SERVICE_NAME || 'ts-microservice',
+            revision_name: process.env.K_REVISION || 'unknown',
+            location: process.env.CLOUD_RUN_LOCATION || 'unknown',
+          },
+        },
+        labels: {
+          environment,
+        },
+      });
+
+      transports.push(googleLogging);
+    }
+
+    // Add file transport in production (for backup/local access)
     if (environment === 'production') {
       // Application logs
       transports.push(
@@ -101,11 +128,7 @@ export class LoggerService {
     });
   }
 
-  private formatMessage(
-    level: string,
-    message: string,
-    context?: LogContext
-  ): any {
+  private formatMessage(message: string, context?: LogContext): any {
     const logEntry: {[key: string]: unknown} = {
       message,
       timestamp: new Date().toISOString(),
@@ -124,21 +147,39 @@ export class LoggerService {
     return logEntry;
   }
 
+  private addSourceLocation(error?: Error): any {
+    if (!error) return {};
+
+    const stack = error.stack?.split('\n')[1];
+    if (!stack) return {};
+
+    const match = stack.match(/at\s+(.+)\s+\((.+):(\d+):(\d+)\)/);
+    if (!match) return {};
+
+    return {
+      'logging.googleapis.com/sourceLocation': {
+        file: match[2],
+        line: match[3],
+        function: match[1],
+      },
+    };
+  }
+
   debug(message: string, context?: LogContext): void {
-    this.logger.debug(this.formatMessage('debug', message, context));
+    this.logger.debug(this.formatMessage(message, context));
   }
 
   info(message: string, context?: LogContext): void {
-    this.logger.info(this.formatMessage('info', message, context));
+    this.logger.info(this.formatMessage(message, context));
   }
 
   warn(message: string, context?: LogContext): void {
-    this.logger.warn(this.formatMessage('warn', message, context));
+    this.logger.warn(this.formatMessage(message, context));
   }
 
   error(message: string, error?: Error, context?: LogContext): void {
     this.logger.error(
-      this.formatMessage('error', message, {
+      this.formatMessage(message, {
         ...context,
         error: error
           ? {
@@ -147,11 +188,12 @@ export class LoggerService {
               stack: error.stack,
             }
           : undefined,
+        ...this.addSourceLocation(error),
       })
     );
   }
 
   http(message: string, context?: LogContext): void {
-    this.logger.http(this.formatMessage('http', message, context));
+    this.logger.http(this.formatMessage(message, context));
   }
 }
