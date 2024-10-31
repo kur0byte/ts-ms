@@ -8,16 +8,34 @@ import {TYPES} from '@config/dic/types';
 import {CustomerTypeOrmRepository} from '@Customer/infrastructure/CustomerTypeOrm.repository';
 import {LoggerService} from '@shared/logger/logger';
 import {RequestLoggerMiddleware} from '@shared/middleware/request-logger-middleware';
+import {BaseServer} from '@shared/server/HTTPServer.abstract';
+import {HTTPMicroserviceServer} from '../../infrastructure/http/express/server';
+import {CustomerHTTPRoutes} from '@Customer/presentation/Customer.routes';
 
 const container = new Container({autoBindInjectable: true});
 
-// Logger
-// Register logger service as singleton
-container.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
-
-// Register request logger middleware
+// Middlewares
 container
   .bind<RequestLoggerMiddleware>(RequestLoggerMiddleware)
+  .toSelf()
+  .inSingletonScope();
+
+// Logger
+container.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
+
+// Server
+container
+  .bind<BaseServer>(BaseServer)
+  .to(HTTPMicroserviceServer)
+  .inSingletonScope();
+container
+  .bind<HTTPMicroserviceServer>(HTTPMicroserviceServer)
+  .toSelf()
+  .inSingletonScope();
+
+// Routes
+container
+  .bind<CustomerHTTPRoutes>(CustomerHTTPRoutes)
   .toSelf()
   .inSingletonScope();
 
