@@ -3,6 +3,7 @@ import winston, {Logger, format} from 'winston';
 import {LoggingWinston} from '@google-cloud/logging-winston';
 import 'winston-daily-rotate-file';
 import {randomUUID} from 'crypto';
+import path from 'path';
 
 const {combine, timestamp, json, colorize, printf, errors} = format;
 
@@ -68,6 +69,7 @@ export class LoggerService {
     // Add Google Cloud Logging in production
     if (environment === 'production' && projectId) {
       const googleLogging = new LoggingWinston({
+        keyFilename: path.join(__dirname, '../../../gcp_iam_key.json'),
         projectId,
         logName: 'ts-microservice',
         serviceContext: {
