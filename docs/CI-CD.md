@@ -1,4 +1,4 @@
-# CI/CD Pipeline Documentation
+# CI/CD Pipeline
 
 ## Pipeline Overview
 

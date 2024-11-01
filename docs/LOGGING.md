@@ -1,4 +1,4 @@
-# Logging System
+# Logging
 
 ## Overview
 
