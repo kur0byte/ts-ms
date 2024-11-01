@@ -1,11 +1,11 @@
 import 'reflect-metadata';
+import helmet from 'helmet';
 import {injectable} from 'inversify';
 import path from 'path';
 import express, {json, urlencoded, Request, Response} from 'express';
 import {register} from 'prom-client';
 import {LoggerService} from '../logger/logger';
 import {RequestLoggerMiddleware} from '../middleware/requestLogger-middleware';
-import helmet from 'helmet';
 import {CorrelationIdMiddleware} from '../middleware/correlationId.middleware';
 import {ErrorHandlingMiddleware} from '../middleware/errorHandling.middleware';
 import {iocContainer} from '../../config/dic/inversify.config';
