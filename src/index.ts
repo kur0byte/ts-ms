@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import 'module-alias/register';
 import {iocContainer} from './config/dic/inversify.config';
-import {LoggerService} from '@shared/logger/logger';
+import {LoggerService} from './shared/logger/logger';
 import {HTTPMicroserviceServer} from './infrastructure/http/express/server';
 
 async function bootstrap() {

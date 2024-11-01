@@ -1,4 +1,4 @@
-import {Customer} from '@Customer/domain/Customer';
+// import {Customer} from '@Customer/domain/Customer';
 import {DataSource} from 'typeorm';
 
 export const AppDataSource = new DataSource({
@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   database: 'myapp',
   synchronize: true,
   logging: false,
-  entities: [Customer],
+  entities: [],
   subscribers: [],
   migrations: [],
 });

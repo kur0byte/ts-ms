@@ -10,8 +10,8 @@ import express, {
   NextFunction,
 } from 'express';
 import {register} from 'prom-client';
-import {LoggerService} from '@shared/logger/logger';
-import {RequestLoggerMiddleware} from '@shared/middleware/request-logger-middleware';
+import {LoggerService} from '../../shared/logger/logger';
+import {RequestLoggerMiddleware} from '../../shared/middleware/request-logger-middleware';
 
 @injectable()
 export class HTTPBaseServer {
