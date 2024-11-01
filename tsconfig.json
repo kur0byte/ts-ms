@@ -22,6 +22,6 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ],
+, "instrumentation.ts"  ],
 "exclude": ["node_modules"],
 }
