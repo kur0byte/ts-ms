@@ -1,20 +1,23 @@
 import {Container} from 'inversify';
-import {TYPES} from '@config/dic/types';
-import {LoggerService} from '../../shared/logger/logger';
-import {RequestLoggerMiddleware} from '../../shared/middleware/request-logger-middleware';
-import {HTTPBaseServer} from '../../shared/server/HTTPBaseServer.abstract';
+
 import {HTTPMicroserviceServer} from '../../infrastructure/http/express/server';
+
+import {LoggerService} from '../../shared/logger/logger';
+import {HTTPBaseServer} from '../../shared/microservers/HTTPBaseServer.abstract';
+
+import {RequestLoggerMiddleware} from '../../shared/middleware/requestLogger-middleware';
+import {CorrelationIdMiddleware} from '../../shared/middleware/correlationId.middleware';
+import {ErrorHandlingMiddleware} from '../../shared/middleware/errorHandling.middleware';
 
 const container = new Container({autoBindInjectable: true});
 
 // Middlewares
-container
-  .bind<RequestLoggerMiddleware>(RequestLoggerMiddleware)
-  .toSelf()
-  .inSingletonScope();
+container.bind<RequestLoggerMiddleware>(RequestLoggerMiddleware).toSelf();
+container.bind<CorrelationIdMiddleware>(CorrelationIdMiddleware).toSelf();
+container.bind<ErrorHandlingMiddleware>(ErrorHandlingMiddleware).toSelf();
 
 // Logger
-container.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
+container.bind<LoggerService>(LoggerService).toSelf();
 
 // Server
 container
