@@ -28,6 +28,10 @@ FROM node:20-alpine
 # Install Python and other runtime dependencies
 RUN apk add --no-cache python3 make g++
 
+# Create machine-id file
+RUN mkdir -p /etc && echo "dummy-machine-id" > /etc/machine-id
+RUN mkdir -p /var/lib/dbus && echo "dummy-machine-id" > /var/lib/dbus/machine-id
+
 # Set the working directory in the container to /app
 WORKDIR /app
 
