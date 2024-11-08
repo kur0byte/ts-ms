@@ -1,10 +1,9 @@
 import 'reflect-metadata';
-
 import {injectable} from 'inversify';
 import winston, {Logger, format} from 'winston';
 import {LoggingWinston} from '@google-cloud/logging-winston';
 import 'winston-daily-rotate-file';
-import {randomUUID} from 'crypto';
+import crypto from 'crypto';
 import path from 'path';
 
 const {combine, timestamp, json, colorize, printf, errors} = format;
@@ -24,12 +23,16 @@ export interface LogContext {
   [key: string]: unknown;
 }
 
-const ENVIRONMENT = process.env.NODE_ENV || 'development';
-const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT;
-const SERVICE_NAME = process.env.SERVICE_NAME || 'ts-microservice';
-const VERSION = process.env.VERSION || 'unknown';
-const CLOUD_RUN_LOCATION = process.env.CLOUD_RUN_LOCATION || 'unknown';
-const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+function getEnvVar(name: string, defaultValue: string): string {
+  return process.env[name] ?? defaultValue;
+}
+
+const ENVIRONMENT = getEnvVar('NODE_ENV', 'development');
+const PROJECT_ID = getEnvVar('GOOGLE_CLOUD_PROJECT', '');
+const SERVICE_NAME = getEnvVar('SERVICE_NAME', 'ts-microservice');
+const VERSION = getEnvVar('VERSION', 'unknown');
+const CLOUD_RUN_LOCATION = getEnvVar('CLOUD_RUN_LOCATION', 'unknown');
+const LOG_LEVEL = getEnvVar('LOG_LEVEL', 'info');
 
 const SENSITIVE_FIELDS = ['password', 'secret', 'token', 'authorization'];
 
@@ -48,7 +51,7 @@ export class LoggerService {
   private createTransports(): winston.transport[] {
     const transports: winston.transport[] = [
       new winston.transports.Console({
-        level: ENVIRONMENT === 'production' ? 'info' : 'debug',
+        level: ENVIRONMENT === 'production' ? LogLevel.INFO : LogLevel.DEBUG,
         format:
           ENVIRONMENT === 'production'
             ? this.customFormat()
@@ -61,10 +64,16 @@ export class LoggerService {
         transports.push(this.createGoogleCloudTransport());
       }
       transports.push(
-        this.createDailyRotateFileTransport('logs/app-%DATE%.log', 'info')
+        this.createDailyRotateFileTransport(
+          'logs/app-%DATE%.log',
+          LogLevel.INFO
+        )
       );
       transports.push(
-        this.createDailyRotateFileTransport('logs/error-%DATE%.log', 'error')
+        this.createDailyRotateFileTransport(
+          'logs/error-%DATE%.log',
+          LogLevel.ERROR
+        )
       );
     }
 
@@ -83,10 +92,11 @@ export class LoggerService {
     return combine(
       colorize(),
       printf(({level, message, timestamp, ...metadata}) => {
-        let msg = `${timestamp} [${level}]: ${message}`;
-        if (metadata.requestId) msg += ` [RequestId: ${metadata.requestId}]`;
-        if (metadata.error?.stack) msg += `\nError: ${metadata.error.stack}`;
-        return msg;
+        return `${timestamp} [${level}] ${SERVICE_NAME} - ${message} ${Object.entries(
+          metadata
+        )
+          .map(([key, value]) => `[${key}: ${value}]`)
+          .join(' ')}`;
       })
     );
   }
@@ -124,13 +134,15 @@ export class LoggerService {
     const logEntry: {[key: string]: unknown} = {
       message,
       timestamp: new Date().toISOString(),
-      requestId: context?.requestId || randomUUID(),
+      requestId: context?.requestId || crypto.randomUUID(),
       ...context,
     };
 
-    for (const field of SENSITIVE_FIELDS) {
-      if (logEntry[field]) {
-        logEntry[field] = '[REDACTED]';
+    if (Object.keys(logEntry).some(key => SENSITIVE_FIELDS.includes(key))) {
+      for (const field of SENSITIVE_FIELDS) {
+        if (logEntry[field]) {
+          logEntry[field] = '[REDACTED]';
+        }
       }
     }
 
@@ -138,7 +150,7 @@ export class LoggerService {
   }
 
   private addSourceLocation(error?: Error): any {
-    if (!error) return {};
+    if (!error || !error.stack) return {};
 
     const stack = error.stack?.split('\n')[1];
     if (!stack) return {};
