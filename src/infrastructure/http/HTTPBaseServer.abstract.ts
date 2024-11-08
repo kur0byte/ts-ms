@@ -16,7 +16,7 @@ import {ConfigService} from '../config/config.service';
 import {CloudProfiler} from '../observability/profiler/profiler';
 
 @injectable()
-export abstract class HTTPApplication {
+export class HTTPApplication {
   private server!: InversifyExpressServer;
   private httpServer: any;
   private container = iocContainer.getContainer();
@@ -50,7 +50,7 @@ export abstract class HTTPApplication {
     // Initialize tracing before setting up the server
     await this.tracingService.initialize();
 
-    // Start the Cloud Profiler
+    // Initialize the cloud profiler
     await this.cloudProfiler.start();
 
     this.server = new InversifyExpressServer(this.container, null, {
