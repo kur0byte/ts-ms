@@ -31,7 +31,7 @@ RUN npm ci
 COPY --from=builder /app/build ./build
 
 # Make port 3000 available to the world outside this container
-EXPOSE 3000
+EXPOSE 4500
 
 # Define environment variable
 ARG VERSION=latest
@@ -41,4 +41,4 @@ ENV VERSION=$VERSION
 LABEL org.opencontainers.image.version=$VERSION
 
 # Run the app when the container launches
-CMD ["node", "build/src/index.js"]
+CMD ["node", "build/src/main.js"]
