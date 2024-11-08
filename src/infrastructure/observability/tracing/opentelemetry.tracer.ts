@@ -23,12 +23,14 @@ import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
+import {HttpInstrumentation} from '@opentelemetry/instrumentation-http';
+import {ObservabilityConfig} from '../../config/observability.config';
 
 @injectable()
 export class OpenTelemetryTracer {
-  private config!: any;
+  private config!: ObservabilityConfig;
   private sdk!: NodeSDK;
-  private currentSpan?: Span;
+  private tracer!: Tracer;
 
   constructor(
     @inject(TYPES.LoggerService) private readonly logger: LoggerService,
@@ -38,8 +40,10 @@ export class OpenTelemetryTracer {
   }
 
   private initializeConfig(): void {
-    this.config = this.configService.get('ObservabilityConfig');
-    this.logger.info('Observability config:', {a: this.config});
+    this.config = this.configService.get(
+      'ObservabilityConfig'
+    ) as ObservabilityConfig;
+    this.logger.info('Observability config:', {...this.config});
 
     if (this.config.tracing.environment === 'development') {
       diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
@@ -60,36 +64,23 @@ export class OpenTelemetryTracer {
       exporter: 'google-cloud-trace-exporter',
     });
     const spanProcessor =
-      this.config.environment === 'production'
-        ? new BatchSpanProcessor(new TraceExporter())
+      this.config.tracing.environment === 'production'
+        ? new BatchSpanProcessor(traceExporter)
         : new SimpleSpanProcessor(new ConsoleSpanExporter());
 
-    const instrumentations: any = [
-      // new HttpInstrumentation(),
-      // new GrpcInstrumentation(),
-      // new ExpressInstrumentation(),
-      // new MongoDBInstrumentation(),
-      // new PgInstrumentation(),
-      // new RedisInstrumentation(),
-      // new MySqlInstrumentation(),
-      // new AwsSdkInstrumentation(),
-      // new AwsInstrumentation(),
-      // new HttpInstrumentation(),
-      // new GrpcInstrumentation(),
-      // new ExpressInstrumentation(),
-      // new MongoDBInstrumentation(),
-      // new PgInstrumentation(),
-      // new RedisInstrumentation(),
-      // new MySqlInstrumentation(),
-      // new AwsSdkInstrumentation(),
-      // new AwsInstrumentation(),
+    const instrumentations = [
+      new HttpInstrumentation(),
+      // ... other instrumentations ...
     ];
+
     this.sdk = new NodeSDK({
       resource,
       traceExporter,
       spanProcessors: [spanProcessor],
       instrumentations,
     });
+
+    this.tracer = trace.getTracer('default');
   }
 
   public async initialize(): Promise<void> {
@@ -100,9 +91,7 @@ export class OpenTelemetryTracer {
         environment: this.config.tracing.environment,
       });
     } catch (error) {
-      if (error instanceof Error) {
-        this.logger.error('Failed to initialize tracing', error);
-      }
+      this.logger.error('Failed to initialize tracing', error as Error);
       throw error;
     }
   }
@@ -112,34 +101,30 @@ export class OpenTelemetryTracer {
       await this.sdk.shutdown();
       this.logger.info('Tracing shut down');
     } catch (error) {
-      if (error instanceof Error) {
-        this.logger.error('Failed to shutdown tracing', error);
-      }
+      this.logger.error('Failed to shutdown tracing', error as Error);
       throw error;
     }
   }
 
-  getCurrentSpan(): Span | undefined {
-    return trace.getSpan(context.active());
-  }
-
   public endSpan(): void {
-    if (this.currentSpan) {
-      this.currentSpan.end();
-      this.currentSpan = undefined;
+    const span = trace.getSpan(context.active());
+    if (span) {
+      span.end();
     }
   }
 
   public addAttribute(key: string, value: string | number | boolean): void {
-    if (this.currentSpan) {
-      this.currentSpan.setAttribute(key, value);
+    const span = trace.getSpan(context.active());
+    if (span) {
+      span.setAttribute(key, value);
     }
   }
 
   public setError(error: Error): void {
-    if (this.currentSpan) {
-      this.currentSpan.recordException(error);
-      this.currentSpan.setStatus({
+    const span = trace.getSpan(context.active());
+    if (span) {
+      span.recordException(error);
+      span.setStatus({
         code: SpanStatusCode.ERROR,
         message: error.message,
       });
@@ -147,31 +132,44 @@ export class OpenTelemetryTracer {
   }
 
   public getTraceId(): string | undefined {
-    return this.currentSpan?.spanContext().traceId;
+    const span = trace.getSpan(context.active());
+    return span?.spanContext().traceId;
   }
 
   public startSpan(name: string, options?: SpanOptions): Span {
-    this.currentSpan = trace.getTracer('default').startSpan(name, options);
-    return this.currentSpan;
+    return this.tracer.startSpan(name, options);
   }
 
   public middleware() {
     return (req: Request, res: Response, next: NextFunction) => {
-      const span = trace.getTracer('default').startSpan('http_request', {
+      const span = this.tracer.startSpan('http_request', {
         attributes: {
           'http.method': req.method,
           'http.url': req.url,
         },
       });
 
-      context.with(trace.setSpan(context.active(), span), () => {
-        res.on('finish', () => {
-          span.setAttribute('http.status_code', res.statusCode);
-          span.end();
-        });
+      try {
+        context.with(trace.setSpan(context.active(), span), () => {
+          res.on('finish', () => {
+            span.setAttribute('http.status_code', res.statusCode);
+            span.end();
+          });
+          res.on('error', error => {
+            this.setError(error);
+            span.end();
+          });
 
-        next();
-      });
+          next();
+        });
+      } catch (error) {
+        this.logger.error('Error in OpenTelemetry middleware', error as Error);
+        this.setError(
+          error instanceof Error ? error : new Error('Unknown error')
+        );
+        span.end();
+        next(error);
+      }
     };
   }
 }
