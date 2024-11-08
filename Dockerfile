@@ -10,8 +10,11 @@ WORKDIR /app
 # Copy package.json and pnpm-lock.yaml to the working directory
 COPY package.json pnpm-lock.yaml ./
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Install all dependencies (including dev dependencies)
-RUN npm install -g pnpm && pnpm install
+RUN pnpm install
 
 # Copy the rest of the application code
 COPY . .
@@ -31,8 +34,13 @@ WORKDIR /app
 # Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Install only production dependencies
-RUN npm install -g pnpm && pnpm install --prod
+ENV HUSKY=0
+ENV npm_config_ignore_scripts=true
+RUN pnpm install --prod
 
 # Copy built application from the builder stage
 COPY --from=builder /app/build ./build
