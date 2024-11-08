@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "paths": {
       "@Customer/*": ["src/modules/Customer/*"],
-      "@config/*": ["src/config/*"],
+      "@config/*": ["src/infrastructure/config/*"],
       "@shared/*": ["src/shared/*"],
      },
   },

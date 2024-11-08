@@ -4,28 +4,30 @@ import {injectable} from 'inversify';
 import path from 'path';
 import express, {json, urlencoded, Request, Response} from 'express';
 import {register} from 'prom-client';
-import {LoggerService} from '../logger/logger';
-import {RequestLoggerMiddleware} from '../middleware/requestLogger-middleware';
-import {CorrelationIdMiddleware} from '../middleware/correlationId.middleware';
-import {ErrorHandlingMiddleware} from '../middleware/errorHandling.middleware';
-import {iocContainer} from '../../config/dic/inversify.config';
+import {LoggerService} from '../../infrastructure/observability/logging/logger';
+import {RequestLoggerMiddleware} from '../../infrastructure/http/middlewares/requestLogger-middleware';
+import {CorrelationIdMiddleware} from '../../infrastructure/http/middlewares/correlationId.middleware';
+import {ErrorHandlingMiddleware} from '../../infrastructure/http/middlewares/errorHandling.middleware';
+import {iocContainer} from '../../ioc/container';
+import {TYPES} from '@shared/types';
+// import {iocContainer} from '../../infrastructure/config/dic/inversify.config';
 
-@injectable()
 /**
  * Abstract base class for HTTP servers.
  * Provides common configuration and setup for middleware, routes, and error handling.
  */
+@injectable()
 export abstract class HTTPBaseServer {
   protected server: express.Application = express();
-  protected logger: LoggerService = iocContainer.get(LoggerService);
+  protected logger: LoggerService = iocContainer.get(TYPES.LoggerService);
   protected requestLogger: RequestLoggerMiddleware = iocContainer.get(
-    RequestLoggerMiddleware
+    TYPES.RequestLoggerMiddleware
   );
   protected correlationIdMiddleware: CorrelationIdMiddleware = iocContainer.get(
-    CorrelationIdMiddleware
+    TYPES.CorrelationIdMiddleware
   );
   protected errorHandlingMiddleware: ErrorHandlingMiddleware = iocContainer.get(
-    ErrorHandlingMiddleware
+    TYPES.ErrorHandlingMiddleware
   );
 
   /**
