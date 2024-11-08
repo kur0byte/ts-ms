@@ -1,6 +1,9 @@
 # Build stage
 FROM node:20-alpine AS builder
 
+# Install Python
+RUN apk add --no-cache python3 make g++
+
 # Set the working directory in the container to /app
 WORKDIR /app
 
@@ -18,6 +21,9 @@ RUN npm run build:compile
 
 # Production stage
 FROM node:20-alpine
+
+# Install Python
+RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
