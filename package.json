@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "test": "jest /tests",
-    "test:watch": "jest --watch /tests",
-    "test:coverage": "jest --coverage /tests",
+    "test": "jest /test",
+    "test:watch": "jest --watch /test",
+    "test:coverage": "jest --coverage /test",
     "build:clean": "gts clean",
     "build:compile": "tsc -b",
     "prepare": "husky",
