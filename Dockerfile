@@ -37,10 +37,8 @@ COPY package.json pnpm-lock.yaml ./
 # Install pnpm
 RUN npm install -g pnpm
 
-# Install only production dependencies
-ENV HUSKY=0
-ENV npm_config_ignore_scripts=true
-RUN pnpm install --prod
+# Copy node_modules from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy built application from the builder stage
 COPY --from=builder /app/build ./build
