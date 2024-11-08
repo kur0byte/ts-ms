@@ -31,13 +31,15 @@ export class CloudProfiler {
     }
 
     await profiler.start({
-      // projectId: this.config.gcp.projectId,
-      // serviceContext: {
-      //   service: this.config.tracing.serviceName,
-      //   version: this.config.profiling.serviceVersion,
-      // },
+      projectId: this.config.gcp.projectId,
+      serviceContext: {
+        service: this.config.tracing.serviceName,
+        version: this.config.profiling.serviceVersion,
+      },
       credentials: this.config.gcp.credentials,
     });
+
+    console.log('Cloud Profiler started');
   }
 }
 

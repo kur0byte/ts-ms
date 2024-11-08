@@ -13,6 +13,7 @@ import {RateLimitMiddleware} from './middlewares/rate-limit.middleware';
 import {OpenTelemetryTracer} from '../observability/tracing/opentelemetry.tracer';
 import {iocContainer} from '../../ioc/container';
 import {ConfigService} from '../config/config.service';
+import {CloudProfiler} from '../observability/profiler/profiler';
 
 @injectable()
 export abstract class HTTPApplication {
@@ -39,7 +40,8 @@ export abstract class HTTPApplication {
     @inject(TYPES.OpenTelemetryTracer)
     private readonly tracingService: OpenTelemetryTracer,
     // @inject(TYPES.TracingService) private readonly tracingService: TracingService
-    @inject(TYPES.ConfigService) private readonly configService: ConfigService
+    @inject(TYPES.ConfigService) private readonly configService: ConfigService,
+    @inject(TYPES.CloudProfiler) private readonly cloudProfiler: CloudProfiler
   ) {
     this.config = this.configService.get('HttpConfig');
   }
@@ -47,6 +49,9 @@ export abstract class HTTPApplication {
   public async setup(): Promise<void> {
     // Initialize tracing before setting up the server
     await this.tracingService.initialize();
+
+    // Start the Cloud Profiler
+    await this.cloudProfiler.start();
 
     this.server = new InversifyExpressServer(this.container, null, {
       rootPath: '/api/v1',
